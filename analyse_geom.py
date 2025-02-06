@@ -37,7 +37,7 @@ def extract_conformers(args):
             pickle_path = os.path.join(args.data_dir, "rdkit_folder", sub_dic["pickle_path"])
             all_paths.append(pickle_path)
 
-    for i, mol_path in tqdm(enumerate(all_paths)):
+    for i, mol_path in enumerate(tqdm(all_paths, desc="Extracting conformers")):
         with open(mol_path, "rb") as f:
             dic = pickle.load(f)
 
@@ -166,7 +166,7 @@ def analyse_geom_stability():
     num_stable_atoms_total = 0
     num_atoms_total = 0
     formatted_data = []
-    for i, (p, at_types) in tqdm(enumerate(zip(all_positions_split, all_atom_types_split))):
+    for i, (p, at_types) in enumerate(tqdm(zip(all_positions_split, all_atom_types_split), desc="Analysing geom stability")):
         p = torch.from_numpy(p)
         at_types = torch.from_numpy(at_types)[:, None]
         one_hot = torch.eq(at_types, atomic_nb_list).int()

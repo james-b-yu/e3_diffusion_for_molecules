@@ -19,7 +19,7 @@ def train_epoch(args, loader, epoch, model, model_dp, model_ema, ema, device, dt
     model.train()
     nll_epoch = []
     n_iterations = len(loader)
-    for i, data in enumerate(loader):
+    for i, data in enumerate(pbar := tqdm(loader)):
         x = data['positions'].to(device, dtype)
         node_mask = data['atom_mask'].to(device, dtype).unsqueeze(2)
         edge_mask = data['edge_mask'].to(device, dtype)
@@ -69,7 +69,7 @@ def train_epoch(args, loader, epoch, model, model_dp, model_ema, ema, device, dt
             ema.update_model_average(model_ema, model)
 
         if i % args.n_report_steps == 0:
-            print(f"\rEpoch: {epoch}, iter: {i}/{n_iterations}, "
+            pbar.set_description(f"TRAIN Epoch: {epoch}, iter: {i}/{n_iterations}, "
                   f"Loss {loss.item():.2f}, NLL: {nll.item():.2f}, "
                   f"RegTerm: {reg_term.item():.1f}, "
                   f"GradNorm: {grad_norm:.1f}")
@@ -109,7 +109,7 @@ def test(args, loader, epoch, eval_model, device, dtype, property_norms, nodes_d
 
         n_iterations = len(loader)
 
-        for i, data in enumerate(loader):
+        for i, data in enumerate(pbar := tqdm(loader)):
             x = data['positions'].to(device, dtype)
             batch_size = x.size(0)
             node_mask = data['atom_mask'].to(device, dtype).unsqueeze(2)
@@ -144,8 +144,7 @@ def test(args, loader, epoch, eval_model, device, dtype, property_norms, nodes_d
             nll_epoch += nll.item() * batch_size
             n_samples += batch_size
             if i % args.n_report_steps == 0:
-                print(f"\r {partition} NLL \t epoch: {epoch}, iter: {i}/{n_iterations}, "
-                      f"NLL: {nll_epoch/n_samples:.2f}")
+                pbar.set_description(f"TEST PARTITION {partition}, epoch: {epoch}, iter: {i}/{n_iterations}, NLL: {nll_epoch/n_samples:.2f}")
 
     return nll_epoch/n_samples
 
