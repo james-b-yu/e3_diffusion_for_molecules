@@ -4,7 +4,7 @@ import numpy as np
 import logging
 import os
 
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from qm9.data.dataset_class import ProcessedDataset
 from qm9.data.prepare import prepare_dataset
 

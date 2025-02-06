@@ -6,7 +6,19 @@ import torch
 from configs.datasets_config import get_dataset_info
 import pickle
 import os
+from multiprocessing import Pool, cpu_count
+from math import floor
+from tqdm import tqdm
+from functools import partial
 
+def _compute_mol(n_types, dataset_info, data):
+        positions = data['positions'][0].view(-1, 3).numpy()
+        one_hot = data['one_hot'][0].view(-1, n_types).type(torch.float32)
+        atom_type = torch.argmax(one_hot, dim=1).numpy()
+
+        mol = build_molecule(torch.tensor(positions), torch.tensor(atom_type), dataset_info)
+        mol = mol2smiles(mol)
+        return mol
 
 def compute_qm9_smiles(dataset_name, remove_h):
     '''
@@ -30,17 +42,15 @@ def compute_qm9_smiles(dataset_name, remove_h):
     dataset_info = get_dataset_info(args_dataset.dataset, args_dataset.remove_h)
     n_types = 4 if remove_h else 5
     mols_smiles = []
-    for i, data in enumerate(dataloaders['train']):
-        positions = data['positions'][0].view(-1, 3).numpy()
-        one_hot = data['one_hot'][0].view(-1, n_types).type(torch.float32)
-        atom_type = torch.argmax(one_hot, dim=1).numpy()
-
-        mol = build_molecule(torch.tensor(positions), torch.tensor(atom_type), dataset_info)
-        mol = mol2smiles(mol)
-        if mol is not None:
-            mols_smiles.append(mol)
-        if i % 1000 == 0:
-            print("\tConverting QM9 dataset to SMILES {0:.2%}".format(float(i)/len(dataloaders['train'])))
+    
+    
+    process_count = cpu_count() if cpu_count() < 4 else floor(0.95 * cpu_count())
+    with Pool(process_count) as pool:
+        wrapped_compute_mol = partial(_compute_mol, n_types, dataset_info)
+        for mol in tqdm(pool.imap(wrapped_compute_mol, dataloaders["train"]), total=len(dataloaders["train"]), desc="Computing qm9 smiles"):
+            if mol is not None:
+                mols_smiles.append(mol)
+        
     return mols_smiles
 
 
@@ -194,4 +204,3 @@ if __name__ == '__main__':
     block_mol = Chem.MolToMolBlock(chem_mol)
     print("Block mol:")
     print(block_mol)
-

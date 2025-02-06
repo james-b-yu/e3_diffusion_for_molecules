@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File with Arguments",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main_qm9.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--n_epochs",
+                "3000",
+                "--exp_name",
+                "edm_qm9",
+                "--n_stability_samples",
+                "1000",
+                "--diffusion_noise_schedule",
+                "polynomial_2",
+                "--diffusion_noise_precision",
+                "1e-5",
+                "--diffusion_steps",
+                "1000",
+                "--diffusion_loss_type",
+                "l2",
+                "--batch_size",
+                "64",
+                "--nf",
+                "256",
+                "--n_layers",
+                "9",
+                "--lr",
+                "1e-4",
+                "--normalize_factors",
+                "[1,4,10]",
+                "--test_epochs",
+                "20",
+                "--ema_decay",
+                "0.9999"
+            ]
+        }
+    ]
+}
