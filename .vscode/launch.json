@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File with Arguments",
+            "name": "QM9",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/main_qm9.py",
@@ -39,6 +39,45 @@
                 "20",
                 "--ema_decay",
                 "0.9999"
+            ]
+        },
+        {
+            "name": "QM7b",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main_qm9.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--n_epochs",
+                "3000",
+                "--exp_name",
+                "edm_qm7b",
+                "--n_stability_samples",
+                "100",
+                "--diffusion_noise_schedule",
+                "polynomial_2",
+                "--diffusion_noise_precision",
+                "1e-5",
+                "--diffusion_steps",
+                "1000",
+                "--diffusion_loss_type",
+                "l2",
+                "--batch_size",
+                "1200",
+                "--nf",
+                "256",
+                "--n_layers",
+                "1",
+                "--lr",
+                "1e-3",
+                "--normalize_factors",
+                "[1,4,10]",
+                "--test_epochs",
+                "100",
+                "--ema_decay",
+                "0.9",
+                "--dataset",
+                "qm7b"
             ]
         }
     ]

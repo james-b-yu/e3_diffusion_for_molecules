@@ -1,4 +1,14 @@
-
+qm7b_with_h = {
+    'name': 'qm7b',
+    'atom_encoder': {'H': 0, 'C': 1, 'N': 2, 'O': 3, 'S': 4, 'Cl': 5},
+    'atom_decoder': ['H', 'C', 'N', 'O', 'S', 'Cl'],
+    'n_nodes': {4: 1, 5: 2, 6: 5, 7: 7, 8: 21, 9: 64, 10: 147, 11: 269, 12: 495, 13: 777, 14: 767, 15: 1219, 16: 786, 17: 1084, 18: 592, 19: 539, 20: 264, 21: 124, 22: 39, 23: 9},
+    'max_n_nodes': 23,
+    'atom_types': {0: 62170, 1: 35959, 2: 6703, 3: 6001, 4: 308, 5: 39},
+    'colors_dic': ['#FFFFFF99', 'C7', 'C0', 'C3', '#FFCC33', '#99CC99'],
+    'radius_dic': [0.46, 0.77, 0.77, 0.77, 1.02, 1.02],
+    'with_h': True
+    }
 
 qm9_with_h = {
     'name': 'qm9',
@@ -150,5 +160,10 @@ def get_dataset_info(dataset_name, remove_h):
             return qm9_second_half
         else:
             raise Exception('Missing config for %s without hydrogens' % dataset_name)
+    elif dataset_name == 'qm7b':
+        if not remove_h:
+            return qm7b_with_h # TODO: for now, we just use qm9 dataset info
+        else:
+            raise NotImplementedError
     else:
         raise Exception("Wrong dataset %s" % dataset_name)

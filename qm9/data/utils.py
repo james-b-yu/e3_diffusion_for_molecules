@@ -133,6 +133,95 @@ def initialize_datasets(args, datadir, dataset, subset=None, splits=None,
 
     return args, datasets, num_species, max_charge
 
+def initialize_datasets_qm7b(args, datadir, dataset, subset=None, splits=None,
+                        force_download=False,
+                        remove_h=False):
+    """
+    Initialize datasets.
+
+    Parameters
+    ----------
+    args : dict
+        Dictionary of input arguments detailing the cormorant calculation.
+    datadir : str
+        Path to the directory where the data and calculations and is, or will be, stored.
+    dataset : str
+        String specification of the dataset.  If it is not already downloaded, must currently by "qm9" or "md17".
+    subset : str, optional
+        Which subset of a dataset to use.  Action is dependent on the dataset given.
+        Must be specified if the dataset has subsets (i.e. MD17).  Otherwise ignored (i.e. GDB9).
+    splits : str, optional
+        TODO: DELETE THIS ENTRY
+    force_download : bool, optional
+        If true, forces a fresh download of the dataset.
+    subtract_thermo : bool, optional
+        If True, subtracts the thermochemical energy of the atoms from each molecule in GDB9.
+        Does nothing for other datasets.
+    remove_h: bool, optional
+        If True, remove hydrogens from the dataset
+    Returns
+    -------
+    args : dict
+        Dictionary of input arguments detailing the cormorant calculation.
+    datasets : dict
+        Dictionary of processed dataset objects (see ????? for more information).
+        Valid keys are "train", "test", and "valid"[ate].  Each associated value
+    num_species : int
+        Number of unique atomic species in the dataset.
+    max_charge : pytorch.Tensor
+        Largest atomic number for the dataset.
+
+    Notes
+    -----
+    TODO: Delete the splits argument.
+    """
+    # Set the number of points based upon the arguments
+    num_pts = {'train': args.num_train,
+               'test': args.num_test, 'valid': args.num_valid}
+
+    # Download and process dataset. Returns datafiles.
+    datafiles = prepare_dataset(
+        datadir, 'qm7b', subset, splits, force_download=force_download)
+
+    # Load downloaded/processed datasets
+    datasets = {}
+    for split, datafile in datafiles.items():
+        with np.load(datafile) as f:
+            datasets[split] = {key: torch.from_numpy(
+                val) for key, val in f.items()}
+
+    # Basic error checking: Check the training/test/validation splits have the same set of keys.
+    keys = [list(data.keys()) for data in datasets.values()]
+    assert all([key == keys[0] for key in keys]
+               ), 'Datasets must have same set of keys!'
+
+    # TODO: remove hydrogens here if needed
+    if remove_h:
+        raise NotImplementedError("")
+
+    # Get a list of all species across the entire dataset
+    all_species = _get_species(datasets, ignore_check=False)
+
+    # Now initialize MolecularDataset based upon loaded data
+    datasets = {split: ProcessedDataset(data, num_pts=num_pts.get(
+        split, -1), included_species=all_species) for split, data in datasets.items()}
+
+    # Now initialize MolecularDataset based upon loaded data
+
+    # Check that all datasets have the same included species:
+    assert(len(set(tuple(data.included_species.tolist()) for data in datasets.values())) ==
+           1), 'All datasets must have same included_species! {}'.format({key: data.included_species for key, data in datasets.items()})
+
+    # These parameters are necessary to initialize the network
+    num_species = datasets['train'].num_species
+    max_charge = datasets['train'].max_charge
+
+    # Now, update the number of training/test/validation sets in args
+    args.num_train = datasets['train'].num_pts
+    args.num_valid = datasets['valid'].num_pts
+    args.num_test = datasets['test'].num_pts
+
+    return args, datasets, num_species, max_charge
 
 def _get_species(datasets, ignore_check=False):
     """

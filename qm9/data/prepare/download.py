@@ -3,6 +3,7 @@ import os
 
 from qm9.data.prepare.md17 import download_dataset_md17
 from qm9.data.prepare.qm9 import download_dataset_qm9
+from qm9.data.prepare.qm7b import download_dataset_qm7b
 
 
 def prepare_dataset(datadir, dataset, subset=None, splits=None, cleanup=True, force_download=False):
@@ -70,6 +71,8 @@ def prepare_dataset(datadir, dataset, subset=None, splits=None, cleanup=True, fo
         logging.info('Dataset does not exist. Downloading!')
         if dataset.lower().startswith('qm9'):
             download_dataset_qm9(datadir, dataset, splits, cleanup=cleanup)
+        elif dataset.lower().startswith('qm7b'):
+            download_dataset_qm7b(datadir, dataset, splits, cleanup=cleanup)
         elif dataset.lower().startswith('md17'):
             download_dataset_md17(datadir, dataset, subset,
                                   splits, cleanup=cleanup)
