@@ -17,5 +17,5 @@
 
 # Changes I made
 1. edited the XYZ-TO-SPHERE conversion script to use multithreading (so it is faster)
-1. added qm7b dataset for unconditional generation
+1. added qm7b dataset for unconditional generation --- to use this, run the command with `--dataset qm7b`
 1. fix model resumption code
