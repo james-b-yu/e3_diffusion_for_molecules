@@ -131,7 +131,7 @@ def plot_molecule(ax, positions, atom_type, alpha, spheres_3d, hex_bg_color,
             s = sorted((atom_type[i], atom_type[j]))
             pair = (dataset_info['atom_decoder'][s[0]],
                     dataset_info['atom_decoder'][s[1]])
-            if 'qm9' in dataset_info['name']:
+            if 'qm9' in dataset_info['name'] or 'qm7b' in dataset_info['name']:
                 draw_edge_int = bond_analyze.get_bond_order(atom1, atom2, dist)
                 line_width = (3 - 2) * 2 * 2
             elif dataset_info['name'] == 'geom':
@@ -186,7 +186,7 @@ def plot_data3d(positions, atom_type, dataset_info, camera_elev=0, camera_azim=0
     plot_molecule(ax, positions, atom_type, alpha, spheres_3d,
                   hex_bg_color, dataset_info)
 
-    if 'qm9' in dataset_info['name']:
+    if 'qm9' in dataset_info['name'] or 'qm7b' in dataset_info['name']:
         max_value = positions.abs().max().item()
 
         # axis_lim = 3.2
@@ -256,7 +256,7 @@ def plot_data3d_uncertainty(
         plot_molecule(ax, positions, atom_type, alpha, spheres_3d,
                       hex_bg_color, dataset_info)
 
-    if 'qm9' in dataset_info['name']:
+    if 'qm9' in dataset_info['name'] or 'qm7b' in dataset_info['name']:
         max_value = all_positions[0].abs().max().item()
 
         # axis_lim = 3.2

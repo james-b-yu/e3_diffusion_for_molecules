@@ -1,7 +1,7 @@
 from torch.utils.data import DataLoader
 from qm9.data.args import init_argparse
 from qm9.data.collate import PreprocessQM9
-from qm9.data.utils import initialize_datasets
+from qm9.data.utils import initialize_datasets, initialize_datasets_qm7b
 import os
 
 
@@ -29,6 +29,21 @@ def retrieve_dataloaders(cfg):
 
         # Construct PyTorch dataloaders from datasets
         preprocess = PreprocessQM9(load_charges=cfg.include_charges)
+        dataloaders = {split: DataLoader(dataset,
+                                         batch_size=batch_size,
+                                         shuffle=args.shuffle if (split == 'train') else False,
+                                         num_workers=num_workers,
+                                         collate_fn=preprocess.collate_fn)
+                             for split, dataset in datasets.items()}
+    elif 'qm7b' in cfg.dataset:
+        batch_size = cfg.batch_size
+        num_workers = cfg.num_workers
+        filter_n_atoms = cfg.filter_n_atoms
+        args = init_argparse('qm7b')
+        args, datasets, num_species, charge_scale = initialize_datasets_qm7b(args, cfg.datadir, cfg.dataset,
+                                                                        force_download=args.force_download,
+                                                                        remove_h=cfg.remove_h)
+        preprocess = PreprocessQM9(load_charges=cfg.include_charges) # we are re-using the same preprocessor as used in qm9
         dataloaders = {split: DataLoader(dataset,
                                          batch_size=batch_size,
                                          shuffle=args.shuffle if (split == 'train') else False,

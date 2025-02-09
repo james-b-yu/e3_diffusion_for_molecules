@@ -202,7 +202,9 @@ def setup_argparse(dataset):
     """
     parser = argparse.ArgumentParser(description='Cormorant network options for the md17 dataset.')
     parser = setup_shared_args(parser)
-    if dataset == "md17":
+    if dataset == "qm7b":
+        pass # XXX: do not add special arguments for now
+    elif dataset == "md17":
         parser.add_argument('--subset', '--molecule', type=str, default='',
                             help='Subset/molecule on data with subsets (such as md17).')
     elif dataset == "qm9":

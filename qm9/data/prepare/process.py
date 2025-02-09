@@ -4,7 +4,7 @@ import torch
 import tarfile
 from torch.nn.utils.rnn import pad_sequence
 
-charge_dict = {'H': 1, 'C': 6, 'N': 7, 'O': 8, 'F': 9}
+charge_dict = {'H': 1, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'S': 16, 'Cl': 17}
 
 
 def split_dataset(data, split_idxs):
@@ -32,6 +32,36 @@ def split_dataset(data, split_idxs):
 
 # def save_database()
 
+
+def process_xyz_qm7b(data, splits, stack=True):
+    raw_mols = []
+    with open(data, "r", encoding="utf8") as f:
+        while((new_line := f.readline()) != ""):
+            if new_line[0] in "0123456789":
+                raw_mols.append([])
+            raw_mols[-1].append(new_line)
+     
+    processed_mols = []        
+    for r in raw_mols:
+        num_atoms = int(r[0])
+        mol_xyz = r[2:num_atoms+2]
+        atom_charges, atom_positions = [], []
+        for line in mol_xyz:
+            atom, posx, posy, posz = line.replace('*^', 'e').split()
+            atom_charges.append(charge_dict[atom])
+            atom_positions.append([float(posx), float(posy), float(posz)])
+            
+        processed_mols.append({'num_atoms': torch.tensor(num_atoms), 'charges': torch.tensor(atom_charges), 'positions': torch.tensor(atom_positions)})
+    
+    res = {}
+    for split_name in splits:
+        filtered = [processed_mols[i] for i in splits[split_name]]
+        filtered = {key: [mol[key] for mol in filtered] for key in filtered[0].keys()}
+        if stack:
+            filtered = {key: pad_sequence(val, batch_first=True) if val[0].dim() > 0 else torch.stack(val) for key, val in filtered.items()}
+        res[split_name] = filtered
+
+    return res
 
 def process_xyz_files(data, process_file_fn, file_ext=None, file_idx_list=None, stack=True):
     """
