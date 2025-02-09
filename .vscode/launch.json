@@ -40,6 +40,27 @@
                 "--ema_decay",
                 "0.9999"
             ]
+        },
+        {
+            "name": "Resume",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main_qm9.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--resume",
+                "outputs/edm_qm9",
+                "--start_epoch",
+                "${input:enterEpoch}"
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "enterEpoch",
+            "type": "promptString",
+            "description": "Start epoch",
+            "default": "0"
         }
     ]
 }
