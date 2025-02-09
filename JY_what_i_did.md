@@ -19,3 +19,9 @@
 1. edited the XYZ-TO-SPHERE conversion script to use multithreading (so it is faster)
 1. added qm7b dataset for unconditional generation --- to use this, run the command above with `--dataset qm7b`
 1. fix model resumption code
+
+# General comments
+By default, we train the model which *explicitly adds hydrogens*; if we add the option `--remove_h` we train the model without hydrogens
+
+# TODOs
+Although the qm7b dataset has been added and allows the model to be correctly trained, it does not yet allow the model to be correctly evaluated. The evaluation code currently still assumes we are using the qm9 dataset. Need to update this!
