@@ -21,7 +21,7 @@ from qm9.utils import prepare_context, compute_mean_mad
 from train_test import train_epoch, test, analyze_and_save
 
 parser = argparse.ArgumentParser(description='E3Diffusion')
-parser.add_argument('--exp_name', type=str, default='debug_10')
+parser.add_argument('--exp_name', type=str, default=None)
 parser.add_argument('--model', type=str, default='egnn_dynamics',
                     help='our_dynamics | schnet | simple_dynamics | '
                          'kernel_dynamics | egnn_dynamics |gnn_dynamics')
@@ -95,9 +95,9 @@ parser.add_argument('--data_augmentation', type=eval, default=False, help='use a
 parser.add_argument("--conditioning", nargs='+', default=[],
                     help='arguments : homo | lumo | alpha | gap | mu | Cv' )
 parser.add_argument('--resume', type=str, default=None,
-                    help='')
-parser.add_argument('--start_epoch', type=int, default=0,
-                    help='')
+                    help='path to the folder containing model files')
+parser.add_argument('--start_epoch', type=int, default=None,
+                    help='defaults to 0 if starting afresh, or the current_epoch if resuming')
 parser.add_argument('--ema_decay', type=float, default=0.999,
                     help='Amount of EMA decay, 0 means off. A reasonable value'
                          ' is 0.999.')
@@ -130,8 +130,9 @@ device = torch.device("cuda" if args.cuda else "cpu")
 dtype = torch.float32
 
 if args.resume is not None:
-    exp_name = args.exp_name + '_resume'
-    start_epoch = args.start_epoch
+    exp_name_manual = args.exp_name
+    start_epoch_manual = args.start_epoch
+    
     resume = args.resume
     wandb_usr = args.wandb_usr
     normalization_factor = args.normalization_factor
@@ -143,8 +144,16 @@ if args.resume is not None:
     args.resume = resume
     args.break_train_epoch = False
 
-    args.exp_name = exp_name
-    args.start_epoch = start_epoch
+    # only change exp_name if it has been manually set by the user
+    if exp_name_manual is not None:
+        args.exp_name = exp_name_manual
+
+    # if start_epoch is not manually set by the user, continue from the last epoch; otherwise, set manually
+    if start_epoch_manual is None:
+        args.start_epoch = args.current_epoch
+    else:
+        args.start_epoch = start_epoch_manual
+        
     args.wandb_usr = wandb_usr
 
     # Careful with this -->
@@ -154,6 +163,13 @@ if args.resume is not None:
         args.aggregation_method = aggregation_method
 
     print(args)
+else:
+    # if exp_name is None, then set it to debug_10
+    if args.exp_name is None:
+        args.exp_name = 'debug_10'
+    if args.start_epoch is None:
+        args.start_epoch = 0
+
 
 utils.create_folders(args)
 # print(args)
