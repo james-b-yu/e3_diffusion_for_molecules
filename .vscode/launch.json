@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Resume qm7b",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main_qm9.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--resume",
+                "outputs/edm_qm7b"
+            ]
+        },
+        {
             "name": "QM9",
             "type": "debugpy",
             "request": "launch",

@@ -117,11 +117,6 @@ parser.add_argument('--aggregation_method', type=str, default='sum',
                     help='"sum" or "mean"')
 args = parser.parse_args()
 
-dataset_info = get_dataset_info(args.dataset, args.remove_h)
-
-atom_encoder = dataset_info['atom_encoder']
-atom_decoder = dataset_info['atom_decoder']
-
 # args, unparsed_args = parser.parse_known_args()
 args.wandb_usr = utils.get_wandb_username(args.wandb_usr)
 
@@ -170,6 +165,10 @@ else:
     if args.start_epoch is None:
         args.start_epoch = 0
 
+dataset_info = get_dataset_info(args.dataset, args.remove_h)
+
+atom_encoder = dataset_info['atom_encoder']
+atom_decoder = dataset_info['atom_decoder']
 
 utils.create_folders(args)
 # print(args)
