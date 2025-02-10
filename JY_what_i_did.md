@@ -11,7 +11,7 @@
    ```
    python main_qm9.py --n_epochs 1300 --exp_name edm_qm9 --n_stability_samples 1000 --diffusion_noise_schedule polynomial_2 --diffusion_noise_precision 1e-5 --diffusion_steps 1000 --diffusion_loss_type l2 --batch_size 64 --nf 256 --n_layers 9 --lr 1e-4 --normalize_factors [1,4,10] --test_epochs 20 --ema_decay 0.9999
    ```
-   This creates a model in `outputs/edm_qm9`, but you can change this by setting `--exp_name "new_name"` in which case the model will output to `outputs/new_name`
+   This creates a model in `outputs/edm_qm9`, but you can change this by changing the setting `--exp_name "new_name"` in which case the model will output to `outputs/new_name`
 1. to resume a run, suppose we have a folder `outputs/edm_qm9` which contains `args.pickle`, `generative_model_ema.npy`, `generative_model.npy` and `optim.npy`. Replace `<N>` with the epoch number after that model was checkpointed and run the following
    ```
    python main_qm9.py --resume outputs/edm_qm9 --start_epoch <N>
@@ -36,3 +36,10 @@ By default, we train the model which *explicitly adds hydrogens*; if we add the 
 
 # TODOs
 Although the qm7b dataset has been added and allows the model to be correctly trained, it does not yet allow the model to be correctly evaluated. The evaluation code currently still assumes we are using the qm9 dataset. Need to update this! Mainly `qm9/analyze.py` and `qm9/visualiser.py`.
+
+
+# Training qm7b
+```
+python main_qm9.py --n_epochs 1300 --exp_name edm_qm7b --n_stability_samples 1000 --diffusion_noise_schedule polynomial_2 --diffusion_noise_pr
+ecision 1e-5 --diffusion_steps 200 --diffusion_loss_type l2 --batch_size 196 --nf 128 --n_layers 5 --lr 1e-3 --normalize_factors [1,4,10] --test_epochs 20 --ema_decay 0.9999 --dataset qm7b
+```
