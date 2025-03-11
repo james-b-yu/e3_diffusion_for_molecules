@@ -1,3 +1,4 @@
+import tqdm
 from equivariant_diffusion import utils
 import numpy as np
 import math
@@ -5,7 +6,7 @@ import torch
 from egnn import models
 from torch.nn import functional as F
 from equivariant_diffusion import utils as diffusion_utils
-
+import wandb
 
 # Defining some useful util functions.
 def expm1(x: torch.Tensor) -> torch.Tensor:
@@ -451,6 +452,11 @@ class EnVariationalDiffusion(torch.nn.Module):
         eps_t = net_out
         if self.training and self.loss_type == 'l2':
             denom = (self.n_dims + self.in_node_nf) * eps_t.shape[1]
+            mean_error = ((eps - eps_t) ** 2).sum() / (eps != 0).sum()
+            if eps.shape[-1] == 9:
+                wandb.log({
+                    "mean_error": mean_error
+                })
             error = sum_except_batch((eps - eps_t) ** 2) / denom
         else:
             error = sum_except_batch((eps - eps_t) ** 2)
@@ -771,7 +777,8 @@ class EnVariationalDiffusion(torch.nn.Module):
         diffusion_utils.assert_mean_zero_with_mask(z[:, :, :self.n_dims], node_mask)
 
         # Iteratively sample p(z_s | z_t) for t = 1, ..., T, with s = t - 1.
-        for s in reversed(range(0, self.T)):
+        for s in reversed((range(0, self.T))):
+            print(s)
             s_array = torch.full((n_samples, 1), fill_value=s, device=z.device)
             t_array = s_array + 1
             s_array = s_array / self.T

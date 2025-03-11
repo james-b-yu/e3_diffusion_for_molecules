@@ -5,6 +5,34 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug pretrained model",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main_qm9.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--resume",
+                "outputs/pretrained_epoch_1240_bak",
+                "--exp_name",
+                "debugging pretrained model",
+                "--start_epoch",
+                "1241"
+            ]
+        },
+        {
+            "name": "Evaluate pretrained model",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/eval_analyze.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--model_path",
+                "outputs/pretrained_epoch_1240_bak",
+                "--exp_name",
+                "debugging pretrained model",
+            ]
+        },
+        {
             "name": "Resume qm7b",
             "type": "debugpy",
             "request": "launch",
@@ -53,16 +81,16 @@
             ]
         },
         {
-            "name": "Resume",
+            "name": "Resume Finetune",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/main_qm9.py",
             "console": "integratedTerminal",
             "args": [
                 "--resume",
-                "outputs/edm_qm9",
+                "outputs/edm_qm9_no_h_finetune_checkpoint",
                 "--start_epoch",
-                "${input:enterEpoch}"
+                "1400"
             ]
         }
     ],
