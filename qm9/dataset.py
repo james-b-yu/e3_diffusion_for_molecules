@@ -30,9 +30,9 @@ def retrieve_dataloaders(cfg):
         # Construct PyTorch dataloaders from datasets
         preprocess = PreprocessQM9(load_charges=cfg.include_charges)
         dataloaders = {split: DataLoader(dataset,
-                                         batch_size=batch_size,
-                                         shuffle=args.shuffle if (split == 'train') else False,
-                                         num_workers=num_workers,
+                                         batch_size=64,
+                                         shuffle=False,
+                                         num_workers=0,
                                          collate_fn=preprocess.collate_fn)
                              for split, dataset in datasets.items()}
     elif 'qm7b' in cfg.dataset:
